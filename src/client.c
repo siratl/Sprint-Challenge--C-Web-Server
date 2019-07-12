@@ -12,7 +12,8 @@
 /**
  * Struct to hold all three pieces of a URL
  */
-typedef struct urlinfo_t {
+typedef struct urlinfo_t
+{
   char *hostname;
   char *port;
   char *path;
@@ -49,6 +50,28 @@ urlinfo_t *parse_url(char *url)
   // IMPLEMENT ME! //
   ///////////////////
 
+  char *http = strstr(hostname, "http://");
+  if (http)
+  {
+    hostname += 7;
+  }
+  char *https = strstr(hostname, "https://");
+  if (https)
+  {
+    hostname += 8;
+  }
+
+  char *slash = strstr(hostname, "/");
+  path = slash + 1;
+  *slash = '\0';
+
+  char *colon = strchr(hostname, ':');
+  port = colon + 1;
+  *colon = '\0';
+
+  urlinfo->hostname = hostname;
+  urlinfo->path = path;
+  urlinfo->port = port;
   return urlinfo;
 }
 
@@ -76,12 +99,13 @@ int send_request(int fd, char *hostname, char *port, char *path)
 }
 
 int main(int argc, char *argv[])
-{  
-  int sockfd, numbytes;  
+{
+  int sockfd, numbytes;
   char buf[BUFSIZE];
 
-  if (argc != 2) {
-    fprintf(stderr,"usage: client HOSTNAME:PORT/PATH\n");
+  if (argc != 2)
+  {
+    fprintf(stderr, "usage: client HOSTNAME:PORT/PATH\n");
     exit(1);
   }
 
@@ -96,6 +120,9 @@ int main(int argc, char *argv[])
   ///////////////////
   // IMPLEMENT ME! //
   ///////////////////
-
+  urlinfo_t *urlinfo = parse_url(argv[1]);
+  printf("host: %s\n", urlinfo->hostname);
+  printf("path: %s\n", urlinfo->path);
+  printf("port: %s\n", urlinfo->port);
   return 0;
 }
